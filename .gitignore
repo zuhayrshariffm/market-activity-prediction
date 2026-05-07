@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# Data and model artifacts
+data/raw/
+data/processed/
+models/
+*.pkl
+*.joblib
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+
+# PyCharm
+.idea/
