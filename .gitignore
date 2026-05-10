@@ -23,3 +23,5 @@ models/
 
 # PyCharm
 .idea/
+mlruns/
+mlflow.db
