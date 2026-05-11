@@ -11,6 +11,7 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from lightgbm import LGBMClassifier
+from xgboost import XGBClassifier
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
@@ -132,6 +133,30 @@ def train_lightgbm_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pipeline:
     return model
 
 
+def train_xgboost_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pipeline:
+    """Train an XGBoost model."""
+    model = Pipeline(
+        steps=[
+            (
+                "classifier",
+                XGBClassifier(
+                    n_estimators=200,
+                    learning_rate=0.05,
+                    max_depth=3,
+                    subsample=0.8,
+                    colsample_bytree=0.8,
+                    eval_metric="logloss",
+                    random_state=RANDOM_STATE,
+                ),
+            ),
+        ]
+    )
+
+    model.fit(X_train, y_train)
+
+    return model
+
+
 def evaluate_model(
     model: Pipeline, X_test: pd.DataFrame, y_test: pd.Series
 ) -> dict[str, float]:
@@ -234,6 +259,19 @@ if __name__ == "__main__":
                 "class_weight": "balanced",
             },
         },
+        "xgboost-baseline": {
+            "model": train_xgboost_model(X_train, y_train),
+            "params": {
+                "model_type": "xgboost",
+                "n_estimators": 200,
+                "learning_rate": 0.05,
+                "max_depth": 3,
+                "subsample": 0.8,
+                "colsample_bytree": 0.8,
+                "eval_metric": "logloss",
+            },
+        },
+
     }
 
     best_model_name = None
