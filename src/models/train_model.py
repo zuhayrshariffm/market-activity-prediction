@@ -112,6 +112,7 @@ def train_random_forest_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pipe
 
     return model
 
+
 def train_lightgbm_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pipeline:
     """Train a LightGBM model."""
     model = Pipeline(
@@ -271,7 +272,6 @@ if __name__ == "__main__":
                 "eval_metric": "logloss",
             },
         },
-
     }
 
     best_model_name = None
