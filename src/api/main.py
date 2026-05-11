@@ -3,6 +3,7 @@ FastAPI app for serving activity spike predictions.
 """
 
 from pathlib import Path
+from typing import List
 
 import joblib
 import pandas as pd
@@ -67,3 +68,38 @@ def predict(features: MarketFeatures) -> dict[str, float | int]:
         "spike_probability": float(spike_probability),
         "prediction": prediction,
     }
+
+@app.post("/predict-batch")
+def predict_batch(markets: list[MarketFeatures]) -> list[dict[str, float | int]]:
+    """Predict activity spike probabilities for multiple markets."""
+    feature_records = [market.model_dump() for market in markets]
+    feature_df = pd.DataFrame(feature_records)
+    feature_df = feature_df[FEATURE_COLUMNS]
+
+    spike_probabilities = model.predict_proba(feature_df)[:, 1]
+    predictions = (spike_probabilities >= 0.5).astype(int)
+
+    results = []
+
+    for features, spike_probability, prediction in zip(
+        feature_records,
+        spike_probabilities,
+        predictions,
+    ):
+        prediction_value = int(prediction)
+        probability_value = float(spike_probability)
+
+        log_prediction(
+            features=features,
+            spike_probability=probability_value,
+            prediction=prediction_value,
+        )
+
+        results.append(
+            {
+                "spike_probability": probability_value,
+                "prediction": prediction_value,
+            }
+        )
+
+    return results
