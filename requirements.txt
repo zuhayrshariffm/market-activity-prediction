@@ -12,3 +12,5 @@ python-dotenv
 mlflow
 streamlit
 black
+lightgbm
+xgboost
