@@ -41,3 +41,74 @@ The first version of the model will use a binary label:
 activity_spike = 1 if next_24h_volume > 2 * trailing_7d_average_volume
 activity_spike = 0 otherwise
 ```
+
+## How to Run
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the full offline workflow:
+
+```bash
+python -m scripts.run_offline_pipeline
+```
+
+This fetches recent Polymarket market data, builds features, creates labels, trains and compares models, scores markets, exports feature importance, and summarizes prediction logs if available.
+
+Run the prediction API:
+
+```bash
+uvicorn src.api.main:app --reload
+```
+
+The API will be available at:
+
+```text
+http://127.0.0.1:8000
+```
+
+Interactive API docs are available at:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+Run the Streamlit dashboard:
+
+```bash
+streamlit run src/dashboard/app.py
+```
+
+The dashboard will usually be available at:
+
+```text
+http://localhost:8501
+```
+
+Run MLflow UI:
+
+```bash
+mlflow ui
+```
+
+The MLflow experiment dashboard will usually be available at:
+
+```text
+http://127.0.0.1:5000
+```
+
+## Current Modeling Note
+
+The current target uses a proxy activity spike label based on recent 24-hour volume relative to trailing 1-week average daily volume. This allows the end-to-end ML workflow to be validated with currently available snapshot data.
+
+A future version will use time-series market snapshots to create forward-looking labels, such as whether a market experiences a volume, liquidity, volatility, or trade-count spike in the next 24 hours.
