@@ -150,3 +150,26 @@ http://127.0.0.1:5000
 The current target uses a proxy activity spike label based on recent 24-hour volume relative to trailing 1-week average daily volume. This allows the end-to-end ML workflow to be validated with currently available snapshot data.
 
 A future version will use time-series market snapshots to create forward-looking labels, such as whether a market experiences a volume, liquidity, volatility, or trade-count spike in the next 24 hours.
+
+## What This Project Demonstrates
+
+- ML feature engineering on prediction market data
+- Binary classification target design
+- Baseline and ensemble model comparison
+- MLflow experiment tracking
+- Model artifact saving and reuse
+- FastAPI model serving
+- Batch inference
+- Prediction logging and monitoring summaries
+- Streamlit dashboarding
+- Dockerized API environment
+
+## Limitations and Future Work
+
+- Current labels use a proxy spike definition based on recent volume, not a fully forward-looking historical outcome.
+- Future data collection should store repeated market snapshots over time.
+- Future labels should measure whether a market spikes in the next 24 hours after each snapshot.
+- Add time-based train/validation/test splits once historical snapshots are available.
+- Add feature drift monitoring and realized precision/recall tracking after outcomes are observed.
+- Compare additional models such as XGBoost or LightGBM.
+- Move storage from local CSV files to PostgreSQL or DuckDB for more scalable analysis.
