@@ -10,6 +10,7 @@ import mlflow.sklearn
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
+from lightgbm import LGBMClassifier
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
@@ -99,6 +100,26 @@ def train_random_forest_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pipe
                 "classifier",
                 RandomForestClassifier(
                     n_estimators=200,
+                    class_weight="balanced",
+                    random_state=RANDOM_STATE,
+                ),
+            ),
+        ]
+    )
+
+    model.fit(X_train, y_train)
+
+    return model
+
+def train_lightgbm_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pipeline:
+    """Train a LightGBM model."""
+    model = Pipeline(
+        steps=[
+            (
+                "classifier",
+                LGBMClassifier(
+                    n_estimators=200,
+                    learning_rate=0.05,
                     class_weight="balanced",
                     random_state=RANDOM_STATE,
                 ),
@@ -201,6 +222,15 @@ if __name__ == "__main__":
             "params": {
                 "model_type": "random_forest",
                 "n_estimators": 200,
+                "class_weight": "balanced",
+            },
+        },
+        "lightgbm-baseline": {
+            "model": train_lightgbm_model(X_train, y_train),
+            "params": {
+                "model_type": "lightgbm",
+                "n_estimators": 200,
+                "learning_rate": 0.05,
                 "class_weight": "balanced",
             },
         },
