@@ -10,7 +10,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from src.models.train_model import FEATURE_COLUMNS
-
+from src.monitoring.prediction_logger import log_prediction
 
 MODEL_PATH = Path("models/activity_spike_model.joblib")
 
@@ -57,6 +57,11 @@ def predict(features: MarketFeatures) -> dict[str, float | int]:
 
     spike_probability = model.predict_proba(feature_df)[0, 1]
     prediction = int(spike_probability >= 0.5)
+    log_prediction(
+        features=features.model_dump(),
+        spike_probability=float(spike_probability),
+        prediction=prediction,
+    )
 
     return {
         "spike_probability": float(spike_probability),

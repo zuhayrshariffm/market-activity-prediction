@@ -25,3 +25,4 @@ models/
 .idea/
 mlruns/
 mlflow.db
+data/monitoring/
