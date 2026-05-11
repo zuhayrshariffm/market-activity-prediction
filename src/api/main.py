@@ -9,11 +9,17 @@ import joblib
 import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
+from src.config import load_config
+
 
 from src.models.train_model import FEATURE_COLUMNS
 from src.monitoring.prediction_logger import log_prediction
 
-MODEL_PATH = Path("models/activity_spike_model.joblib")
+config = load_config()
+
+MODEL_PATH = Path(config["files"]["model_artifact"])
+PREDICTION_THRESHOLD = config["model"]["threshold"]
+
 
 app = FastAPI(title="Market Activity Spike Prediction API")
 
@@ -57,7 +63,8 @@ def predict(features: MarketFeatures) -> dict[str, float | int]:
     feature_df = feature_df[FEATURE_COLUMNS]
 
     spike_probability = model.predict_proba(feature_df)[0, 1]
-    prediction = int(spike_probability >= 0.5)
+    prediction = int(spike_probability >= PREDICTION_THRESHOLD
+)
     log_prediction(
         features=features.model_dump(),
         spike_probability=float(spike_probability),
@@ -78,7 +85,7 @@ def predict_batch(markets: list[MarketFeatures]) -> list[dict[str, float | int]]
     feature_df = feature_df[FEATURE_COLUMNS]
 
     spike_probabilities = model.predict_proba(feature_df)[:, 1]
-    predictions = (spike_probabilities >= 0.5).astype(int)
+    predictions = (spike_probabilities >= PREDICTION_THRESHOLD).astype(int)
 
     results = []
 
