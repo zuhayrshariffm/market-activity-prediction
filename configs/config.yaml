@@ -1,0 +1,17 @@
+data:
+  raw_dir: data/raw
+  processed_dir: data/processed
+  monitoring_dir: data/monitoring
+
+files:
+  market_snapshot: data/processed/market_snapshot.csv
+  labeled_snapshot: data/processed/market_snapshot_labeled.csv
+  market_predictions: data/processed/market_predictions.csv
+  prediction_log: data/monitoring/prediction_log.csv
+  model_artifact: models/activity_spike_model.joblib
+
+model:
+  threshold: 0.5
+  test_size: 0.25
+  random_state: 42
+  experiment_name: market-activity-spike-prediction
