@@ -42,6 +42,44 @@ activity_spike = 1 if next_24h_volume > 2 * trailing_7d_average_volume
 activity_spike = 0 otherwise
 ```
 
+## Architecture
+
+```text
+Polymarket API
+   ↓
+Raw JSON ingestion
+   ↓
+Market snapshot feature table
+   ↓
+Proxy activity spike labels
+   ↓
+Model training + MLflow experiment tracking
+   ↓
+Saved model artifact
+   ↓
+Batch scoring + FastAPI prediction serving
+   ↓
+Prediction logging + monitoring summary
+   ↓
+Streamlit dashboard
+```
+
+## Project Structure
+
+```text
+configs/        Shared project configuration
+scripts/        Offline workflow runner
+src/ingestion/  Polymarket API client and raw data fetch
+src/features/   Market snapshot feature engineering
+src/labeling/   Activity spike label generation
+src/models/     Model training and MLflow logging
+src/evaluation/ Model evaluation and feature importance
+src/inference/  Batch market scoring
+src/api/        FastAPI prediction service
+src/monitoring/ Prediction logging and monitoring summaries
+src/dashboard/  Streamlit dashboard
+```
+
 ## How to Run
 
 Create and activate a virtual environment:
