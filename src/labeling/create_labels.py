@@ -9,12 +9,17 @@ from pathlib import Path
 
 import pandas as pd
 
-def load_market_snapshot(path: Path = Path("data/processed/market_snapshot.csv")) -> pd.DataFrame:
+
+def load_market_snapshot(
+    path: Path = Path("data/processed/market_snapshot.csv"),
+) -> pd.DataFrame:
     """Load the processed market snapshot dataset."""
     return pd.read_csv(path)
 
 
-def add_activity_spike_label(df: pd.DataFrame, spike_multiplier: float = 2.0) -> pd.DataFrame:
+def add_activity_spike_label(
+    df: pd.DataFrame, spike_multiplier: float = 2.0
+) -> pd.DataFrame:
     """
     Add a binary activity spike label.
 

@@ -9,6 +9,7 @@ from typing import Any
 
 import requests
 
+
 class PolymarketClient:
     """Simple client for Polymarket market data."""
 

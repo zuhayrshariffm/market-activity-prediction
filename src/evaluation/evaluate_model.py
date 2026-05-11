@@ -12,7 +12,9 @@ from sklearn.model_selection import train_test_split
 from src.models.train_model import FEATURE_COLUMNS, TARGET_COLUMN
 
 
-def load_labeled_data(path: Path = Path("data/processed/market_snapshot_labeled.csv")) -> pd.DataFrame:
+def load_labeled_data(
+    path: Path = Path("data/processed/market_snapshot_labeled.csv"),
+) -> pd.DataFrame:
     """Load labeled market data."""
     return pd.read_csv(path)
 

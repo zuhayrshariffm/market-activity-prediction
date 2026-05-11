@@ -68,7 +68,9 @@ def split_features_and_target(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series
     return X, y
 
 
-def train_logistic_regression_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pipeline:
+def train_logistic_regression_model(
+    X_train: pd.DataFrame, y_train: pd.Series
+) -> Pipeline:
     """Train a logistic regression baseline model."""
     model = Pipeline(
         steps=[
@@ -87,6 +89,7 @@ def train_logistic_regression_model(X_train: pd.DataFrame, y_train: pd.Series) -
     model.fit(X_train, y_train)
 
     return model
+
 
 def train_random_forest_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pipeline:
     """Train a random forest model."""
@@ -108,7 +111,9 @@ def train_random_forest_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pipe
     return model
 
 
-def evaluate_model(model: Pipeline, X_test: pd.DataFrame, y_test: pd.Series) -> dict[str, float]:
+def evaluate_model(
+    model: Pipeline, X_test: pd.DataFrame, y_test: pd.Series
+) -> dict[str, float]:
     """Evaluate model performance on a holdout set."""
     y_pred = model.predict(X_test)
     y_prob = model.predict_proba(X_test)[:, 1]
@@ -141,15 +146,16 @@ def save_model(model: Pipeline, path: Path = MODEL_PATH) -> Path:
 
     return path
 
+
 def log_mlflow_run(
-            model: Pipeline,
-            metrics: dict[str, float],
-            model_name: str,
-            model_params: dict[str, int | str | float],
-            train_rows: int,
-            test_rows: int,
-            spike_rate: float,
-    ) -> None:
+    model: Pipeline,
+    metrics: dict[str, float],
+    model_name: str,
+    model_params: dict[str, int | str | float],
+    train_rows: int,
+    test_rows: int,
+    spike_rate: float,
+) -> None:
     """Log training metadata, metrics, and model artifact to MLflow."""
     mlflow.set_experiment(EXPERIMENT_NAME)
 

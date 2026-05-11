@@ -63,8 +63,7 @@ def predict(features: MarketFeatures) -> dict[str, float | int]:
     feature_df = feature_df[FEATURE_COLUMNS]
 
     spike_probability = model.predict_proba(feature_df)[0, 1]
-    prediction = int(spike_probability >= PREDICTION_THRESHOLD
-)
+    prediction = int(spike_probability >= PREDICTION_THRESHOLD)
     log_prediction(
         features=features.model_dump(),
         spike_probability=float(spike_probability),

@@ -37,7 +37,7 @@ def score_markets(df: pd.DataFrame, model) -> pd.DataFrame:
 
     scored_df["spike_probability"] = model.predict_proba(X)[:, 1]
     scored_df["prediction"] = (
-            scored_df["spike_probability"] >= PREDICTION_THRESHOLD
+        scored_df["spike_probability"] >= PREDICTION_THRESHOLD
     ).astype(int)
 
     scored_df = scored_df.sort_values(

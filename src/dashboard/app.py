@@ -18,8 +18,11 @@ st.set_page_config(
     layout="wide",
 )
 
+
 @st.cache_data
-def load_feature_importance(path: Path = FEATURE_IMPORTANCE_PATH) -> pd.DataFrame | None:
+def load_feature_importance(
+    path: Path = FEATURE_IMPORTANCE_PATH,
+) -> pd.DataFrame | None:
     """Load feature importance output if available."""
     if not path.exists():
         return None
@@ -89,7 +92,9 @@ st.subheader("Prediction Distribution")
 st.subheader("Top Model Drivers")
 
 if feature_importance is None:
-    st.info("No feature importance file found. Run python -m src.evaluation.feature_importance first.")
+    st.info(
+        "No feature importance file found. Run python -m src.evaluation.feature_importance first."
+    )
 else:
     top_features = feature_importance.head(10).set_index("feature")
     st.bar_chart(top_features["importance"])
