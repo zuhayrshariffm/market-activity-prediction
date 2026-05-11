@@ -10,12 +10,21 @@ import streamlit as st
 
 PREDICTIONS_PATH = Path("data/processed/market_predictions.csv")
 MONITORING_LOG_PATH = Path("data/monitoring/prediction_log.csv")
+FEATURE_IMPORTANCE_PATH = Path("data/processed/feature_importance.csv")
 
 
 st.set_page_config(
     page_title="Market Activity Spike Predictions",
     layout="wide",
 )
+
+@st.cache_data
+def load_feature_importance(path: Path = FEATURE_IMPORTANCE_PATH) -> pd.DataFrame | None:
+    """Load feature importance output if available."""
+    if not path.exists():
+        return None
+
+    return pd.read_csv(path)
 
 
 @st.cache_data
@@ -40,6 +49,8 @@ def load_monitoring_log(path: Path = MONITORING_LOG_PATH) -> pd.DataFrame | None
 
 predictions = load_predictions()
 monitoring_log = load_monitoring_log()
+feature_importance = load_feature_importance()
+
 
 st.title("Market Activity Spike Predictions")
 
@@ -74,6 +85,20 @@ st.dataframe(
 )
 
 st.subheader("Prediction Distribution")
+
+st.subheader("Top Model Drivers")
+
+if feature_importance is None:
+    st.info("No feature importance file found. Run python -m src.evaluation.feature_importance first.")
+else:
+    top_features = feature_importance.head(10).set_index("feature")
+    st.bar_chart(top_features["importance"])
+    st.dataframe(
+        feature_importance.head(15),
+        use_container_width=True,
+        hide_index=True,
+    )
+
 
 st.bar_chart(predictions["spike_probability"])
 
