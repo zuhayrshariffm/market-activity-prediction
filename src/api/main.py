@@ -69,6 +69,7 @@ def predict(features: MarketFeatures) -> dict[str, float | int]:
         "prediction": prediction,
     }
 
+
 @app.post("/predict-batch")
 def predict_batch(markets: list[MarketFeatures]) -> list[dict[str, float | int]]:
     """Predict activity spike probabilities for multiple markets."""
