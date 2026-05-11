@@ -9,10 +9,14 @@ import pandas as pd
 
 from src.models.train_model import FEATURE_COLUMNS
 
+from src.config import load_config
 
-MODEL_PATH = Path("models/activity_spike_model.joblib")
-INPUT_PATH = Path("data/processed/market_snapshot.csv")
-OUTPUT_PATH = Path("data/processed/market_predictions.csv")
+config = load_config()
+
+MODEL_PATH = Path(config["files"]["model_artifact"])
+INPUT_PATH = Path(config["files"]["market_snapshot"])
+OUTPUT_PATH = Path(config["files"]["market_predictions"])
+PREDICTION_THRESHOLD = config["model"]["threshold"]
 
 
 def load_market_snapshot(path: Path = INPUT_PATH) -> pd.DataFrame:
@@ -32,7 +36,9 @@ def score_markets(df: pd.DataFrame, model) -> pd.DataFrame:
     X = scored_df[FEATURE_COLUMNS].fillna(0)
 
     scored_df["spike_probability"] = model.predict_proba(X)[:, 1]
-    scored_df["prediction"] = (scored_df["spike_probability"] >= 0.5).astype(int)
+    scored_df["prediction"] = (
+            scored_df["spike_probability"] >= PREDICTION_THRESHOLD
+    ).astype(int)
 
     scored_df = scored_df.sort_values(
         by="spike_probability",
