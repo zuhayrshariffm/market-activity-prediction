@@ -11,7 +11,7 @@ env/
 # Data and model artifacts
 data/raw/
 data/processed/
-models/
+/models/
 *.pkl
 *.joblib
 
