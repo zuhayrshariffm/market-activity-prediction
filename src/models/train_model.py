@@ -9,6 +9,7 @@ import mlflow
 import mlflow.sklearn
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
@@ -67,7 +68,7 @@ def split_features_and_target(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series
     return X, y
 
 
-def train_activity_spike_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pipeline:
+def train_logistic_regression_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pipeline:
     """Train a logistic regression baseline model."""
     model = Pipeline(
         steps=[
@@ -77,6 +78,25 @@ def train_activity_spike_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pip
                 LogisticRegression(
                     class_weight="balanced",
                     max_iter=1000,
+                    random_state=RANDOM_STATE,
+                ),
+            ),
+        ]
+    )
+
+    model.fit(X_train, y_train)
+
+    return model
+
+def train_random_forest_model(X_train: pd.DataFrame, y_train: pd.Series) -> Pipeline:
+    """Train a random forest model."""
+    model = Pipeline(
+        steps=[
+            (
+                "classifier",
+                RandomForestClassifier(
+                    n_estimators=200,
+                    class_weight="balanced",
                     random_state=RANDOM_STATE,
                 ),
             ),
@@ -121,21 +141,22 @@ def save_model(model: Pipeline, path: Path = MODEL_PATH) -> Path:
 
     return path
 
-
 def log_mlflow_run(
-    model: Pipeline,
-    metrics: dict[str, float],
-    train_rows: int,
-    test_rows: int,
-    spike_rate: float,
-) -> None:
+            model: Pipeline,
+            metrics: dict[str, float],
+            model_name: str,
+            model_params: dict[str, int | str | float],
+            train_rows: int,
+            test_rows: int,
+            spike_rate: float,
+    ) -> None:
     """Log training metadata, metrics, and model artifact to MLflow."""
     mlflow.set_experiment(EXPERIMENT_NAME)
 
-    with mlflow.start_run(run_name="logistic-regression-baseline"):
-        mlflow.log_param("model_type", "logistic_regression")
-        mlflow.log_param("class_weight", "balanced")
-        mlflow.log_param("max_iter", 1000)
+    with mlflow.start_run(run_name=model_name):
+        for param_name, param_value in model_params.items():
+            mlflow.log_param(param_name, param_value)
+
         mlflow.log_param("random_state", RANDOM_STATE)
         mlflow.log_param("test_size", TEST_SIZE)
         mlflow.log_param("feature_count", len(FEATURE_COLUMNS))
@@ -160,17 +181,54 @@ if __name__ == "__main__":
         random_state=RANDOM_STATE,
         stratify=y,
     )
+    models_to_train = {
+        "logistic-regression-baseline": {
+            "model": train_logistic_regression_model(X_train, y_train),
+            "params": {
+                "model_type": "logistic_regression",
+                "class_weight": "balanced",
+                "max_iter": 1000,
+            },
+        },
+        "random-forest-baseline": {
+            "model": train_random_forest_model(X_train, y_train),
+            "params": {
+                "model_type": "random_forest",
+                "n_estimators": 200,
+                "class_weight": "balanced",
+            },
+        },
+    }
 
-    trained_model = train_activity_spike_model(X_train, y_train)
-    model_metrics = evaluate_model(trained_model, X_test, y_test)
-    saved_path = save_model(trained_model)
+    best_model_name = None
+    best_model = None
+    best_metrics = None
+    best_score = -1.0
 
-    log_mlflow_run(
-        model=trained_model,
-        metrics=model_metrics,
-        train_rows=len(X_train),
-        test_rows=len(X_test),
-        spike_rate=float(y.mean()),
-    )
+    for model_name, model_info in models_to_train.items():
+        print(f"\nEvaluating {model_name}")
 
-    print(f"\nSaved model to {saved_path}")
+        model = model_info["model"]
+        metrics = evaluate_model(model, X_test, y_test)
+
+        log_mlflow_run(
+            model=model,
+            metrics=metrics,
+            model_name=model_name,
+            model_params=model_info["params"],
+            train_rows=len(X_train),
+            test_rows=len(X_test),
+            spike_rate=float(y.mean()),
+        )
+
+        if metrics["roc_auc"] > best_score:
+            best_score = metrics["roc_auc"]
+            best_model_name = model_name
+            best_model = model
+            best_metrics = metrics
+
+    saved_path = save_model(best_model)
+
+    print(f"\nBest model: {best_model_name}")
+    print(f"Best ROC-AUC: {best_metrics['roc_auc']:.4f}")
+    print(f"Saved best model to {saved_path}")
