@@ -1,10 +1,10 @@
 # Market Activity Spike Prediction
 
-This project builds an end-to-end machine learning pipeline to predict short-term activity spikes in prediction markets using Polymarket API data.
+This project builds an end-to-end machine learning pipeline to predict short-term activity spikes in prediction markets using Polymarket data.
 
-The goal is to identify markets that are likely to experience a near-term surge in activity, such as increased volume, higher liquidity, greater volatility, more trades etc.
+The goal is to identify markets that are likely to experience a near-term surge in activity, such as increased volume, higher liquidity, greater volatility, more trades, or large price movement.
 
-These markets would then be prime candidates for extra advertising, boosting (think landing page of the website etc.).
+These markets could be candidates for additional visibility, ranking, or promotional placement.
 
 ## Project Objective
 
@@ -18,7 +18,7 @@ A volume spike can be defined as future 24-hour volume exceeding a market’s re
 
 ## Data Source
 
-The project uses prediction market data from Polymarket.
+The project uses prediction market data from Polymarket, including market metadata, pricing, liquidity, volume, and activity fields.
 
 Potential data fields include:
 
@@ -28,10 +28,7 @@ Potential data fields include:
 
 ## Feature Engineering
 
-The pipeline will create features such as:
-
-- Recent volume over 1-hour, 6-hour, and 24-hour windows
-- Rolling average volume
+The pipeline creates market-level volume, liquidity, pricing, momentum, timing, and activity features.
 
 ## Label Definition
 
@@ -171,5 +168,5 @@ A future version will use time-series market snapshots to create forward-looking
 - Future labels should measure whether a market spikes in the next 24 hours after each snapshot.
 - Add time-based train/validation/test splits once historical snapshots are available.
 - Add feature drift monitoring and realized precision/recall tracking after outcomes are observed.
-- Compare additional models such as XGBoost or LightGBM.
+- Tune boosting model hyperparameters and evaluate additional time-aware validation strategies.
 - Move storage from local CSV files to PostgreSQL or DuckDB for more scalable analysis.
